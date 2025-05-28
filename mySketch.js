@@ -3,6 +3,14 @@ let pelicanY;
 let speedX;
 let direction = 1;
 
+// Jump variables
+let pelicanVelocityY = 0;
+let gravity = 0.5;
+let jumpPower = -12;
+let groundY;
+let jumpCount = 0;
+let maxJumps = 2;
+
 let trail = [];
 let clouds = [];
 
@@ -11,6 +19,7 @@ function setup() {
   pelicanX = 0;
   pelicanY = height * 0.7;
   speedX = 2;
+  groundY = height * 0.7; // Set ground level for jumping
 
   // Create initial clouds
   for (let i = 0; i < 5; i++) {
@@ -23,7 +32,7 @@ function setup() {
 }
 
 function draw() {
-  background(135, 206, 250); // sky blue
+  background(186, 143, 224); // pastel purple sky
 
   // Draw and move clouds
   drawClouds();
@@ -41,6 +50,17 @@ function draw() {
   // update pelican position
   pelicanX += speedX * direction;
 
+  // Apply gravity and jumping physics
+  pelicanVelocityY += gravity;
+  pelicanY += pelicanVelocityY;
+
+  // Keep pelican on ground
+  if (pelicanY > groundY) {
+    pelicanY = groundY;
+    pelicanVelocityY = 0;
+    jumpCount = 0; // Reset jump count when on ground
+  }
+
   // Add trail puff
   trail.push({ x: pelicanX, y: pelicanY + 35, alpha: 255 });
 
@@ -57,7 +77,7 @@ function draw() {
 
 function drawClouds() {
   noStroke();
-  fill(255);
+  fill(255, 255, 200); // pastel yellow - complementary to purple
 
   for (let c of clouds) {
     ellipse(c.x, c.y, 60, 40);
@@ -122,4 +142,12 @@ function drawPelicanOnBike(x, y) {
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
+}
+
+function keyPressed() {
+  // Jump when spacebar is pressed - allows double jumping
+  if (key === ' ' && jumpCount < maxJumps) {
+    pelicanVelocityY = jumpPower;
+    jumpCount++;
+  }
 }
